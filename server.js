@@ -18,10 +18,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
-
-console.log('API_KEY:', API_KEY);
-console.log('API_URL:', API_URL);
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -30,14 +26,9 @@ app.use(express.static(join(__dirname, 'client/build')));
 app.get('/check-url', async (req, res) => {
     try {
         const { url } = req.query;
-        console.log('Checking URL:', url);  // Log the URL being checked
-
         const response = await axios.get(API_URL, {
             params: { url: url, fast: true }
         });
-        
-        console.log('API Response:', response.data);
-
         res.json(response.data);
     } catch (error) {
         console.error('Error from API:', error.message);
