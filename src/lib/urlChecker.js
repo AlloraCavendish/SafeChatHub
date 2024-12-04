@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_PROXY_URL = process.env.REACT_APP_API_URL || 'https://server-for-url-checker.onrender.com'; // Replace with your deployed backend URL
+const API_PROXY_URL = process.env.REACT_APP_API_URL || 'https://server-for-url-checker.onrender.com';
 
 export const checkUrlSafety = async (url) => {
     try {
