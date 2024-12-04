@@ -8,8 +8,8 @@
 - [Features](#features)  
 - [Technologies](#technologies)  
 - [Project Structure](#project-structure)  
-- [Contributing](#contributing)  
-- [License](#license)  
+- [About Developer](#about-developer)
+- [Contact](#contact)   
 
 ---
 
@@ -37,16 +37,35 @@ safechathub/
 │   ├── components/  
 │   │   ├── chat/  
 │   │   ├── detail/  
-│   │   ├── list/  
-│   │   ├── addUser/  
+│   │   ├── list/   
 │   │   ├── login/  
 │   │   └── notification/  
 │   ├── lib/  
 │   │   ├── chatStore.js  
 │   │   ├── firebase.js  
-│   │   ├── upload.js  
+│   │   ├── upload.js
+│   │   ├── urlChecker.js
 │   │   └── userStore.js  
-│   └── App.js  
-├── public/  
+│   ├── App.jsx 
+│   ├── index.css
+│   └── main.jsx
+├── public/
+├── server.js  
 └── package.json  
 
+---
+
+## About Developer
+
+- Developer is a student from **Universiti Teknologi MARA (UiTM)**.
+- This project was develop using template from **https://github.com/safak/react-firebase-chat.git**
+- This project is a part of Final Year Project for subject CSP 600 & CSP 650.
+
+---
+
+## Contact
+
+Got any questions? Kindly contact me at:
+
+- 6017-6336320 (Whatsapp)
+- @ai_man06 (Instagram)
