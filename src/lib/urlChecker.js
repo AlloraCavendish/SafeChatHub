@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_PROXY_URL = 'http://localhost:3001/check-url';
+// Use an environment variable to switch between local and production URLs
+const API_PROXY_URL = process.env.REACT_APP_API_URL || 'https://your-production-url.com/check-url'; // Replace with your deployed backend URL
 
 export const checkUrlSafety = async (url) => {
     try {

@@ -10,7 +10,13 @@ const port = process.env.PORT || 3001;
 const API_KEY = 'EqrXMAHHGdJstz6l5r9lkvhOXNPBKIuT';
 const API_URL = `https://ipqualityscore.com/api/json/url/${API_KEY}`;
 
-app.use(cors());
+const corsOptions = {
+    origin: 'https://safechathub-wcr2.onrender.com/',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
+};
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 const __filename = fileURLToPath(import.meta.url);
@@ -36,5 +42,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server running on ${port}`);
 });
