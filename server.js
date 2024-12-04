@@ -10,11 +10,9 @@ const port = process.env.PORT || 3001;
 const API_KEY = 'EqrXMAHHGdJstz6l5r9lkvhOXNPBKIuT';
 const API_URL = `https://ipqualityscore.com/api/json/url/${API_KEY}`;
 
-// Use the CORS middleware
 app.use(cors());
 app.use(express.json());
 
-// Define __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
