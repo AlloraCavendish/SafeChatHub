@@ -5,9 +5,9 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT;
 
-const API_KEY = 'EqrXMAHHGdJstz6l5r9lkvhOXNPBKIuT';
+const API_KEY = process.env.API_KEY;
 const API_URL = `https://ipqualityscore.com/api/json/url/${API_KEY}`;
 
 const corsOptions = {
