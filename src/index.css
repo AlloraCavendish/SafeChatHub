@@ -5,3 +5,48 @@
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
+
+body {
+  background-image: url("/bg.jpg");
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: white;
+}
+
+.container {
+  /* width: 80%; */
+  max-width: 1200px;
+  height: 90vh;
+  max-height: 1000px; /* Maximum height to prevent it from getting too large on tall screens */
+  background-color: rgba(17, 25, 40, 0.75);
+  backdrop-filter: blur(19px) saturate(180%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.125);
+  display: flex;
+  margin: auto; /* Center the container */
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 95%; /* Slightly larger width on smaller screens */
+    height: 80vh; /* Slightly reduced height on smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    width: 100%; /* Full width on very small screens */
+    height: 70vh; /* Further reduced height on very small screens */
+    border-radius: 8px; /* Smaller border-radius on small screens */
+  }
+}
+
+
+.loading{
+  padding: 50px;
+  font-size: 36px;
+  border-radius: 10px;
+  background-color: rgba(17, 25, 40, 0.9);
+}

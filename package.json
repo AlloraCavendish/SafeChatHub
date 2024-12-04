@@ -10,8 +10,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-native-firebase/app": "^21.0.0",
+    "axios": "^1.7.3",
+    "buffer": "^6.0.3",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "emoji-picker-react": "^4.11.1",
+    "express": "^4.19.2",
+    "firebase": "^10.12.4",
+    "otpauth": "^9.3.4",
+    "otplib": "^12.0.1",
+    "qrcode": "^1.5.4",
+    "qrcode.react": "^4.1.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-qr-code": "^2.0.15",
+    "react-toastify": "^10.0.5",
+    "timeago.js": "^4.0.2",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

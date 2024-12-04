@@ -1,0 +1,243 @@
+.detail {
+  flex: 1;
+  padding: 20px;
+  box-sizing: border-box;
+  /* background-color: #1a1a1a; */
+  color: #fff;
+
+  .user {
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #dddddd35;
+
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .status {
+      color: #9e9e9e;
+      font-size: 14px;
+    }
+  }
+
+  .info {
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+
+    .option {
+      .title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        img {
+          width: 25px;
+          height: 25px;
+          background-color: rgba(17, 25, 40, 0.3);
+          padding: 7px;
+          border-radius: 50%;
+        }
+      }
+
+      .settings, .privacy-help {
+        margin-top: 15px;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+
+        button {
+          width: 100%;
+          margin: 8px 0;
+          padding: 12px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 14px;
+          transition: background-color 0.3s;
+
+          &.clear-chat {
+            background-color: #2196f3;
+            color: white;
+
+            &:hover {
+              background-color: #1976d2;
+            }
+          }
+
+          &.block-user {
+            background-color: rgba(230, 74, 105, 0.553);
+            color: white;
+
+            &:hover {
+              background-color: rgba(220, 20, 60, 0.796);
+            }
+          }
+        }
+      }
+
+      .privacy-help {
+        p {
+          margin: 10px 0;
+          color: #9e9e9e;
+          font-size: 14px;
+        }
+      }
+
+      .photos {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 20px;
+
+        .photoItem {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px;
+          background-color: rgba(255, 255, 255, 0.05);
+          border-radius: 8px;
+          transition: transform 0.3s;
+
+          &:hover {
+            transform: translateX(5px);
+          }
+
+          .photoDetail {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            img {
+              width: 35px;
+              height: 35px;
+              border-radius: 5px;
+              object-fit: cover;
+            }
+
+            span {
+              font-size: 14px;
+              color: #9e9e9e;
+            }
+          }
+
+          .icon {
+            width: 25px;
+            height: 25px;
+            background-color: rgba(17, 25, 40, 0.3);
+            padding: 7px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+
+            &:hover {
+              background-color: rgba(17, 25, 40, 0.5);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Responsive styles remain the same */
+@media (max-width: 768px) {
+  .detail {
+    padding: 10px;
+
+    .user {
+      padding: 15px 10px;
+
+      img {
+        width: 70px;
+        height: 70px;
+      }
+    }
+
+    .info {
+      padding: 10px;
+      gap: 20px;
+
+      .option {
+        .title img {
+          width: 20px;
+          height: 20px;
+          padding: 5px;
+        }
+
+        .photos {
+          .photoItem {
+            .photoDetail img {
+              width: 30px;
+              height: 30px;
+            }
+
+            .icon {
+              width: 20px;
+              height: 20px;
+              padding: 5px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .detail {
+    padding: 5px;
+
+    .user {
+      padding: 10px 5px;
+
+      img {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    .info {
+      padding: 5px;
+      gap: 15px;
+
+      .option {
+        .title img {
+          width: 18px;
+          height: 18px;
+          padding: 4px;
+        }
+
+        .photos {
+          .photoItem {
+            .photoDetail img {
+              width: 25px;
+              height: 25px;
+            }
+
+            .icon {
+              width: 18px;
+              height: 18px;
+              padding: 4px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
