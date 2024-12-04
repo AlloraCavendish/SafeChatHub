@@ -11,7 +11,7 @@ const API_KEY = process.env.API_KEY;
 const API_URL = `https://ipqualityscore.com/api/json/url/${API_KEY}`;
 
 const corsOptions = {
-    origin: 'https://safechathub-wcr2.onrender.com/',
+    origin: 'https://safechathub-wcr2.onrender.com',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
 };
