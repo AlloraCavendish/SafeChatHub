@@ -12,25 +12,28 @@ import {
 import { db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/userStore";
+import upload from "../../lib/upload";
 import { format } from "timeago.js";
 import { checkUrlSafety } from "../../lib/urlChecker";
 import { AES, enc } from "crypto-js";
 
-const GroupChat = () => {
-  const [chat, setChat] = useState({ messages: [], participants: [] });
+const Chat = () => {
+  const [chat, setChat] = useState({ messages: [] });
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
+  const [img, setImg] = useState({file: null, url: "",});
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const { currentUser } = useUserStore();
-  const { chatId, isCurrentUserBlocked } = useChatStore();
+  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } =
+    useChatStore();
 
   const endRef = useRef(null);
 
-  // Scroll to the bottom when messages change
   useEffect(() => {
     if (endRef.current) {
-      const shouldScroll =
-        endRef.current.scrollHeight - endRef.current.scrollTop <=
+      const shouldScroll = 
+        endRef.current.scrollHeight - endRef.current.scrollTop <= 
         endRef.current.clientHeight + 100;
 
       if (shouldScroll) {
@@ -39,16 +42,9 @@ const GroupChat = () => {
     }
   }, [chat.messages]);
 
-  // Fetch chat data from Firestore
   useEffect(() => {
-    if (!chatId) {
-      console.error("chatId is missing");
-      return;
-    }
-
-    const unSub = onSnapshot(doc(db, "groupChats", chatId), (res) => {
-      const data = res.data() || { messages: [], participants: [] };
-      setChat(data);
+    const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
+      setChat(res.data());
     });
 
     return () => {
@@ -61,13 +57,38 @@ const GroupChat = () => {
     setOpen(false);
   };
 
+  const handleImg = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size should be less than 5MB");
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error("Only image files are allowed");
+      return;
+    }
+
+    setImg({
+      file,
+      url: URL.createObjectURL(file),
+    });
+  };
+
+  // Handle Send Function
   const handleSend = async () => {
     const encryptedText = text && AES.encrypt(text, "secretKey").toString();
 
-    if (!encryptedText) {
-      toast.warn("Please enter a message.");
+    if (!encryptedText && !img.file){
+      toast.warn("Please enter a message or upload an image.");
       return;
     }
+
+    let imgUrl = null;
 
     const urlRegex = /((https?:\/\/)?([^\s\/$.?#].[^\s]*))/g;
     const urls = text.match(urlRegex);
@@ -77,7 +98,7 @@ const GroupChat = () => {
 
       try {
         for (let url of urls) {
-          const fullUrl = url.startsWith("http://") || url.startsWith("https://") ? url : `http://${url}`;
+          const fullUrl = url.startsWith('http://') || url.startsWith('https://') ? url : `http://${url}`;
           const result = await checkUrlSafety(fullUrl);
 
           if (result.suspicious) {
@@ -86,52 +107,64 @@ const GroupChat = () => {
 
           if (result.unsafe) {
             toast.error(`The URL "${url}" is flagged as unsafe.`);
-            return;
+            return;  
           }
         }
 
         if (suspiciousUrls.length > 0) {
-          const userConfirmed = window.confirm(
-            `The following URLs are flagged as suspicious:\n\n${suspiciousUrls.join("\n")}\n\nDo you want to proceed with sending this message?`
-          );
+          const userConfirmed = window.confirm(`The following URLs are flagged as suspicious:\n\n${suspiciousUrls.join('\n')}\n\nDo you want to proceed with sending this message?`);
           if (!userConfirmed) {
-            toast.warn("Message not sent due to suspicious URLs detected.");
+            toast.warn('Message not sent due to suspicious URLs detected.');
             return;
           }
         }
+
       } catch (err) {
-        toast.error("There was an issue checking the URL. Please try again.");
+        toast.error('There was an issue checking the URL. Please try again.');
         return;
       }
     }
 
     try {
+      if (img.file) {
+        imgUrl = await upload(img.file);
+        console.log("Image uploaded successfully:", imgUrl);
+      }
+
       const message = {
         senderId: currentUser.id,
-        senderName: currentUser.username,
         text: encryptedText,
         createdAt: new Date(),
+        ...(imgUrl && { img: imgUrl }),
       };
 
-      await updateDoc(doc(db, "groupChats", chatId), {
+      await updateDoc(doc(db, "chats", chatId), {
         messages: arrayUnion(message),
       });
 
-      // Update last message for all participants
-      const participantsUpdate = chat.participants.map(async (participantId) => {
-        const userChatsRef = doc(db, "userGroupChats", participantId);
+      const userIDs = [currentUser.id, user.id];
+
+      await Promise.all(userIDs.map(async (id) => {
+        const userChatsRef = doc(db, "userchats", id);
         const userChatsSnapshot = await getDoc(userChatsRef);
 
         if (userChatsSnapshot.exists()) {
           const userChatsData = userChatsSnapshot.data();
+
           const chatIndex = userChatsData.chats.findIndex(
             (c) => c.chatId === chatId
           );
 
           if (chatIndex > -1) {
-            const encryptedLastMessage = AES.encrypt(text, "secretKey").toString();
+            // Encrypt the last message before storing
+            const encryptedLastMessage = text 
+              ? AES.encrypt(text, "secretKey").toString()
+              : imgUrl
+                ? AES.encrypt("Sent an image", "secretKey").toString()
+                : "";
+
             userChatsData.chats[chatIndex].lastMessage = encryptedLastMessage;
-            userChatsData.chats[chatIndex].isSeen = participantId === currentUser.id;
+            userChatsData.chats[chatIndex].isSeen = id === currentUser.id;
             userChatsData.chats[chatIndex].updatedAt = Date.now();
 
             await updateDoc(userChatsRef, {
@@ -139,14 +172,14 @@ const GroupChat = () => {
             });
           }
         }
-      });
-
-      await Promise.all(participantsUpdate);
+      }));
     } catch (err) {
       console.error("Error sending message:", err);
       toast.error("Failed to send the message. Please try again.");
     } finally {
+      setImg({ file: null, url: "" });
       setText("");
+      setError(null);
     }
   };
 
@@ -154,18 +187,23 @@ const GroupChat = () => {
     <div className="chat">
       <div className="top">
         <div className="user">
-          <img
-            src="./group-avatar.png"
+          <img 
+            src={user?.avatar || "./avatar.png"} 
             alt=""
             onError={(e) => {
               e.target.src = "./avatar.png";
             }}
           />
           <div className="texts">
-            <span>{chat.name || "Group Chat"}</span>
-            <p>{chat.participants?.length || 0} participants</p>
+            <span>{user?.username}</span>
+            <p>Last seen {user?.lastSeen ? format(user.lastSeen) : 'recently'}</p>
           </div>
         </div>
+        {/* <div className="icons">
+          <img src="./phone.png" alt="" />
+          <img src="./video.png" alt="" />
+          <img src="./info.png" alt="" />
+        </div> */}
       </div>
       <div className="center">
         {chat?.messages?.map((message) => {
@@ -185,40 +223,53 @@ const GroupChat = () => {
 
           return (
             <div
-              className={`message ${message.senderId === currentUser?.id ? "own" : ""}`}
+              className={`message ${message.senderId === currentUser?.id ? "own" : ""}`} 
               key={message?.createdAt}
             >
               <div className="texts">
-                {message.senderId !== currentUser?.id && (
-                  <span className="sender-name">{message.senderName}</span>
-                )}
+                {message.img && <img src={message.img} alt="" />}
                 <p>{decryptedText}</p>
-                <span>
-                  {format(
-                    message.createdAt.toDate
-                      ? message.createdAt.toDate()
-                      : new Date(message.createdAt)
-                  )}
-                </span>
+                <span>{format(message.createdAt.toDate ? message.createdAt.toDate() : new Date(message.createdAt))}</span>
               </div>
             </div>
           );
         })}
+
+        {img.url && (
+          <div className="message own">
+            <div className="texts">
+              <img src={img.url} alt="" />
+            </div>
+          </div>
+        )}
         <div ref={endRef}></div>
       </div>
       <div className="bottom">
+        <div className="icons">
+          <label htmlFor="file">
+            <img src="./img.png" alt="" />
+          </label>
+          <input
+            type="file"
+            id="file"
+            style={{ display: "none" }}
+            onChange={handleImg}
+          />
+          <img src="./camera.png" alt="" />
+          <img src="./mic.png" alt="" />
+        </div>
         <input
           type="text"
           placeholder={
-            isCurrentUserBlocked
+            isCurrentUserBlocked || isReceiverBlocked
               ? "You cannot send a message"
               : "Type a message..."
           }
           value={text}
           onChange={(e) => setText(e.target.value)}
-          disabled={isCurrentUserBlocked || isLoading}
+          disabled={isCurrentUserBlocked || isReceiverBlocked || isLoading}
           onKeyPress={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
+            if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
               handleSend();
             }
@@ -237,7 +288,7 @@ const GroupChat = () => {
         <button
           className="sendButton"
           onClick={handleSend}
-          disabled={isCurrentUserBlocked || isLoading}
+          disabled={isCurrentUserBlocked || isReceiverBlocked || isLoading}
         >
           Send
         </button>
@@ -246,4 +297,4 @@ const GroupChat = () => {
   );
 };
 
-export default GroupChat;
+export default Chat;
