@@ -43,9 +43,21 @@ const Chat = () => {
   }, [chat.messages]);
 
   useEffect(() => {
-    const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
-      setChat(res.data());
-    });
+    if (!chatId) {
+      setChat({ messages: [] });
+      return;
+    }
+
+    const unSub = onSnapshot(
+      doc(db, "chats", chatId), 
+      (res) => {
+        setChat(res.exists() ? res.data() : { messages: [] });
+      },
+      (error) => {
+        console.error("Error fetching chat:", error);
+        setChat({ messages: [] });
+      }
+    );
 
     return () => {
       unSub();
@@ -61,13 +73,11 @@ const Chat = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Image size should be less than 5MB");
       return;
     }
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       toast.error("Only image files are allowed");
       return;
@@ -79,7 +89,6 @@ const Chat = () => {
     });
   };
 
-  // Handle Send Function
   const handleSend = async () => {
     const encryptedText = text && AES.encrypt(text, "secretKey").toString();
 
@@ -156,7 +165,6 @@ const Chat = () => {
           );
 
           if (chatIndex > -1) {
-            // Encrypt the last message before storing
             const encryptedLastMessage = text 
               ? AES.encrypt(text, "secretKey").toString()
               : imgUrl
@@ -185,6 +193,13 @@ const Chat = () => {
 
   return (
     <div className="chat">
+      {/* If no user or chatId, show a placeholder */}
+      {!user || !chatId ? (
+        <div className="no-chat-selected">
+          <p>Select a chat to start messaging</p>
+        </div>
+      ) : (
+        <>
       <div className="top">
         <div className="user">
           <img 
@@ -199,11 +214,6 @@ const Chat = () => {
             <p>Last seen {user?.lastSeen ? format(user.lastSeen) : 'recently'}</p>
           </div>
         </div>
-        {/* <div className="icons">
-          <img src="./phone.png" alt="" />
-          <img src="./video.png" alt="" />
-          <img src="./info.png" alt="" />
-        </div> */}
       </div>
       <div className="center">
         {chat?.messages?.map((message) => {
@@ -293,6 +303,8 @@ const Chat = () => {
           Send
         </button>
       </div>
+      </>
+      )}
     </div>
   );
 };

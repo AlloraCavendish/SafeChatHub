@@ -192,4 +192,12 @@
       }
     }
   }
+  .no-chat-selected {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #888;
+    font-size: 18px;
+  }
 }

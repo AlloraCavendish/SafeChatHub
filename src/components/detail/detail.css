@@ -87,8 +87,26 @@
             &:hover {
               background-color: rgba(220, 20, 60, 0.796);
             }
+            padding: 12px;
+            margin-top: 15px;
+            margin-bottom: 15px; /* Adjust the margin as needed */
           }
         }
+      }
+
+      .remove-friend-button {
+        margin-left: 10px;
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+      
+      .remove-friend-button:hover {
+        background-color: #ff6b6b;
       }
 
       .privacy-help {

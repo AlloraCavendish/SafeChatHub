@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./chatList.css";
 import AddUser from "./addUser/addUser";
+import GroupChat from "../../chat/GroupChat";
 import { useUserStore } from "../../../lib/userStore";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../../lib/firebase";
@@ -10,13 +11,19 @@ import { toast } from "react-toastify";
 import { AES, enc } from "crypto-js";
 
 const ChatList = () => {
-  const [chats, setChats] = useState([]);
+  const [groupChats, setGroupChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
   const [input, setInput] = useState("");
-
+  const [addUserMode, setAddUserMode] = useState(false);
+  const [createGroupMode, setCreateGroupMode] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null);
   const { currentUser } = useUserStore();
-  const { chatId, changeChat } = useChatStore();
-
+  const { chatId, changeChat, chats } = useChatStore((state) => ({
+    chatId: state.chatId,
+    changeChat: state.changeChat,
+    chats: state.chats,
+  }));
+  
   const decryptLastMessage = (encryptedMessage) => {
     if (!encryptedMessage) return "";
     
@@ -36,17 +43,42 @@ const ChatList = () => {
   };
 
   useEffect(() => {
+    const fetchGroupChats = async () => {
+      if (currentUser) {
+        const groupDocsRef = doc(db, "users", currentUser.id);
+        const groupDocsSnapshot = await getDoc(groupDocsRef);
+        setGroupChats(groupDocsSnapshot.data()?.groupChats || []);
+      }
+    };
+
+    fetchGroupChats();
+  }, [currentUser]);
+
+
+  useEffect(() => {
     const unSub = onSnapshot(
       doc(db, "userchats", currentUser.id),
       async (res) => {
+        if (!res.exists()) {
+          useChatStore.setState({ chats: [] });
+          return;
+        }
         const items = res.data().chats;
 
         const promises = items.map(async (item) => {
           const userDocRef = doc(db, "users", item.receiverId);
           const userDocSnap = await getDoc(userDocRef);
+
+          if (!userDocSnap.exists()) {
+            return null;
+          }
+
           const user = userDocSnap.data();
+
+          if (user.blocked?.includes(currentUser.id)) {
+            return null;
+          }
           
-          // Decrypt the last message for display
           const decryptedLastMessage = decryptLastMessage(item.lastMessage);
           
           return { 
@@ -57,7 +89,10 @@ const ChatList = () => {
         });
 
         const chatData = await Promise.all(promises);
-        setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
+
+        const validChats = chatData.filter((chat) => chat !== null);
+      
+        useChatStore.setState({ chats: validChats.sort((a, b) => b.updatedAt - a.updatedAt) });
       }
     );
 
@@ -102,9 +137,10 @@ const ChatList = () => {
     }
   };
 
-  const filteredChats = chats.filter((c) =>
-    c.user.username.toLowerCase().includes(input.toLowerCase())
+  const filteredChats = (chats || []).filter((c) => 
+    c.user && c.user.username.toLowerCase().includes(input.toLowerCase())
   );
+   
 
   return (
     <div className="chatList">
@@ -127,13 +163,24 @@ const ChatList = () => {
 
       <div className="user-section">
         <img
-          src={currentUser.avatar || "./avatar.png"}
+          src={currentUser?.avatar || "./avatar.png"}
           alt="Avatar"
           className="avatar"
         />
-        <button onClick={handleLogout} className="logout-button">
-          Logout
-        </button>
+       <div className="buttons-container">
+          {/* <button 
+            onClick={() => {
+              setCreateGroupMode(true);
+              setAddUserMode(false);
+            }} 
+            className="create-group-button"
+          >
+            Create Group
+          </button> */}
+          <button onClick={handleLogout} className="logout-button">
+            Logout
+          </button>
+        </div>
       </div>
 
       {filteredChats.map((chat) => (
@@ -147,17 +194,17 @@ const ChatList = () => {
         >
           <img
             src={
-              chat.user.blocked.includes(currentUser.id)
+              chat.user?.blocked?.includes(currentUser?.id)
                 ? "./avatar.png"
-                : chat.user.avatar || "./avatar.png"
+                : chat.user?.avatar || "./avatar.png"
             }
             alt=""
           />
           <div className="texts">
             <span>
-              {chat.user.blocked.includes(currentUser.id)
+              {chat.user?.blocked?.includes(currentUser?.id)
                 ? "User"
-                : chat.user.username}
+                : chat.user?.username}
             </span>
             <p>{chat.displayMessage}</p>
           </div>
@@ -165,6 +212,13 @@ const ChatList = () => {
       ))}
 
       {addMode && <AddUser />}
+      
+      {createGroupMode && (
+        <GroupChat 
+          setCreateGroupMode={setCreateGroupMode} 
+          setSelectedGroup={setSelectedGroup}
+        />
+      )}
     </div>
   );
 };

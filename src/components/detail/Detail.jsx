@@ -8,10 +8,22 @@ import "./detail.css";
 import { AES, enc } from "crypto-js";
 
 const Detail = () => {
-  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock, resetChat } =
+  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock, resetChat, deleteFriend } =
     useChatStore();
   const { currentUser } = useUserStore();
-  
+
+  const handleRemoveFriend = async () => {
+    const confirmRemove = window.confirm(`Are you sure you want to remove ${user.username} from your friends?`);
+    
+    if (confirmRemove) {
+      try {
+        await deleteFriend();
+      } catch (error) {
+        console.error("Error removing friend:", error);
+      }
+    }
+  };
+
   const [sections, setSections] = useState({
     chatSettings: false,
     privacyHelp: false,
@@ -30,7 +42,6 @@ const Detail = () => {
     isOnline: false
   });
 
-  // Fetch shared media from chat history
   useEffect(() => {
     const fetchSharedMedia = async () => {
       if (!chatId) return;
@@ -46,7 +57,6 @@ const Detail = () => {
           
           messages.forEach(message => {
             if (message.img) {
-              // Decrypt image caption if exists
               let caption = "";
               if (message.text) {
                 try {
@@ -89,7 +99,6 @@ const Detail = () => {
     fetchSharedMedia();
   }, [chatId]);
 
-  // Monitor user status
   useEffect(() => {
     if (!user?.id) return;
     
@@ -170,34 +179,6 @@ const Detail = () => {
       </div>
       
       <div className="info">
-        {/* <div className="option">
-          <div 
-            className="title" 
-            onClick={() => toggleSection('chatSettings')}
-          >
-            <span>Chat Settings</span>
-            <img 
-              src={sections.chatSettings ? "./arrowUp.png" : "./arrowDown.png"} 
-              alt="" 
-            />
-          </div>
-          {sections.chatSettings && (
-            <div className="settings-content">
-              <div className="setting-item">
-                <span>Notifications</span>
-                <input type="checkbox" />
-              </div>
-              <div className="setting-item">
-                <span>Chat Theme</span>
-                <select>
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                </select>
-              </div>
-            </div>
-          )}
-        </div> */}
-
         <div className="option">
           <div 
             className="title" 
@@ -217,6 +198,9 @@ const Detail = () => {
                   : isReceiverBlocked
                   ? "Unblock User"
                   : "Block User"}
+              </button>
+              <button onClick={handleRemoveFriend} className="remove-friend-button">
+                Remove Friend
               </button>
             </div>
           )}
