@@ -135,7 +135,6 @@ const Login = () => {
 
       setQrValue(totp.toString());
       
-      // Sign out the user after successful registration
       await auth.signOut();
       
       toast.success("Account created successfully! Please scan the QR code and set up 2FA.");

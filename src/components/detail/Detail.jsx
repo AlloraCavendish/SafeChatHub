@@ -4,6 +4,7 @@ import { onSnapshot } from "firebase/firestore";
 import { useChatStore } from "../../lib/chatStore";
 import { auth, db } from "../../lib/firebase";
 import { useUserStore } from "../../lib/userStore";
+import { changePassword } from "../../lib/changePassword";
 import "./detail.css";
 import { AES, enc } from "crypto-js";
 
@@ -21,6 +22,14 @@ const Detail = () => {
       } catch (error) {
         console.error("Error removing friend:", error);
       }
+    }
+  };
+
+  const handleChangePassword = async () => {
+    try {
+      await changePassword();
+    } catch (error) {
+      console.error("Error changing password:", error);
     }
   };
 
@@ -201,6 +210,9 @@ const Detail = () => {
               </button>
               <button onClick={handleRemoveFriend} className="remove-friend-button">
                 Remove Friend
+              </button>
+              <button onClick={handleChangePassword} className="change-password-button">
+                Change Password
               </button>
             </div>
           )}
