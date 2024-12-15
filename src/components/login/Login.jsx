@@ -85,7 +85,7 @@ const Login = () => {
     setLoading(true);
 
     const formData = new FormData(e.target);
-    const { username, email, password } = Object.fromEntries(formData);
+    const { username, email, password, confirmPassword } = Object.fromEntries(formData);
 
     if (!username.trim() || username.length < 3) {
       toast.warn("Username must be at least 3 characters!");
