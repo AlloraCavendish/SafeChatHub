@@ -20,7 +20,11 @@ const Login = () => {
   const [countdown, setCountdown] = useState(0);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [registrationComplete, setRegistrationComplete] = useState(false);
-  
+  const [showPassword, setShowPassword] = useState({
+    loginPassword: false,
+    registerPassword: false,
+    confirmPassword: false,
+  });
 
   useEffect(() => {
     let timer;
@@ -36,6 +40,13 @@ const Login = () => {
       if (timer) clearInterval(timer);
     };
   }, [countdown, registrationComplete]);
+
+  const togglePasswordVisibility = (field) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
 
   const generateSecret = () => {
     const secret = new OTPAuth.Secret();
@@ -92,6 +103,12 @@ const Login = () => {
       toast.warn(
         "Password must be at least 6 characters, include one uppercase letter, and one number!"
       );
+      setLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.warn("Passwords do not match!");
       setLoading(false);
       return;
     }
@@ -214,7 +231,21 @@ const Login = () => {
           <h2>Welcome Back!</h2>
           <form onSubmit={handleLogin}>
             <input type="email" placeholder="Email" name="email" required />
-            <input type="password" placeholder="Password" name="password" required />
+            <div className="password-wrapper">
+              <input
+                type={showPassword.loginPassword ? "text" : "password"}
+                placeholder="Password"
+                name="password"
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password-button"
+                onClick={() => togglePasswordVisibility("loginPassword")}
+              >
+                {showPassword.loginPassword ? "🙈" : "👁️"}
+              </button>
+            </div>
             <input
               type="text"
               placeholder="2FA Code"
@@ -277,7 +308,32 @@ const Login = () => {
             />
             <input type="text" placeholder="Username" name="username" required />
             <input type="email" placeholder="Email" name="email" required />
-            <input type="password" placeholder="Password" name="password" required />
+            <div className="password-wrapper">
+              <input
+                type={showPassword.registerPassword ? "text" : "password"}
+                placeholder="Password"
+                name="password"
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password-button"
+                onClick={() => togglePasswordVisibility("registerPassword")}
+              >
+                {showPassword.registerPassword ? "🙈" : "👁️"}
+              </button>
+            </div>
+            <div className="password-wrapper">
+              <input
+                type={showPassword.confirmPassword ? "text" : "password"}
+                placeholder="Confirm Password"
+                name="confirmPassword"
+                required
+              />
+              <button type="button" className="toggle-password-button" onClick={() => togglePasswordVisibility("confirmPassword")} >
+                {showPassword.confirmPassword ? "🙈" : "👁️"}
+              </button>
+            </div>
             <button disabled={loading}>{loading ? "Loading..." : "Sign Up"}</button>
           </form>
           {qrValue && (
