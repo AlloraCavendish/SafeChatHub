@@ -23,18 +23,18 @@ const ChatList = () => {
     changeChat: state.changeChat,
     chats: state.chats,
   }));
-  
+
   const decryptLastMessage = (encryptedMessage) => {
     if (!encryptedMessage) return "";
-    
+
     try {
       const bytes = AES.decrypt(encryptedMessage, "secretKey");
       const decryptedMessage = bytes.toString(enc.Utf8);
-      
+
       if (!decryptedMessage) {
         return "Unable to display message";
       }
-      
+
       return decryptedMessage;
     } catch (error) {
       console.error("Message decryption error:", error);
@@ -53,7 +53,6 @@ const ChatList = () => {
 
     fetchGroupChats();
   }, [currentUser]);
-
 
   useEffect(() => {
     const unSub = onSnapshot(
@@ -78,21 +77,23 @@ const ChatList = () => {
           if (user.blocked?.includes(currentUser.id)) {
             return null;
           }
-          
+
           const decryptedLastMessage = decryptLastMessage(item.lastMessage);
-          
-          return { 
-            ...item, 
+
+          return {
+            ...item,
             user,
-            displayMessage: decryptedLastMessage 
+            displayMessage: decryptedLastMessage,
           };
         });
 
         const chatData = await Promise.all(promises);
 
         const validChats = chatData.filter((chat) => chat !== null);
-      
-        useChatStore.setState({ chats: validChats.sort((a, b) => b.updatedAt - a.updatedAt) });
+
+        useChatStore.setState({
+          chats: validChats.sort((a, b) => b.updatedAt - a.updatedAt),
+        });
       }
     );
 
@@ -107,9 +108,7 @@ const ChatList = () => {
       return rest;
     });
 
-    const chatIndex = userChats.findIndex(
-      (item) => item.chatId === chat.chatId
-    );
+    const chatIndex = userChats.findIndex((item) => item.chatId === chat.chatId);
 
     userChats[chatIndex].isSeen = true;
 
@@ -137,10 +136,9 @@ const ChatList = () => {
     }
   };
 
-  const filteredChats = (chats || []).filter((c) => 
+  const filteredChats = (chats || []).filter((c) =>
     c.user && c.user.username.toLowerCase().includes(input.toLowerCase())
   );
-   
 
   return (
     <div className="chatList">
@@ -153,12 +151,15 @@ const ChatList = () => {
             onChange={(e) => setInput(e.target.value)}
           />
         </div>
-        <img
-          src={addMode ? "./minus.png" : "./plus.png"}
-          alt=""
-          className="add"
-          onClick={() => setAddMode((prev) => !prev)}
-        />
+
+        {!addUserMode && (
+          <img
+            src="./plus.png"
+            alt=""
+            className="add"
+            onClick={() => setAddUserMode(true)}
+          />
+        )}
       </div>
 
       <div className="user-section">
@@ -167,7 +168,7 @@ const ChatList = () => {
           alt="Avatar"
           className="avatar"
         />
-       <div className="buttons-container">
+        <div className="buttons-container">
           {/* <button 
             onClick={() => {
               setCreateGroupMode(true);
@@ -211,13 +212,12 @@ const ChatList = () => {
         </div>
       ))}
 
-      {addMode && <AddUser />}
-      
+      {addUserMode && (
+        <AddUser onClose={() => setAddUserMode(false)} />
+      )}
+
       {createGroupMode && (
-        <GroupChat 
-          setCreateGroupMode={setCreateGroupMode} 
-          setSelectedGroup={setSelectedGroup}
-        />
+        <GroupChat setCreateGroupMode={setCreateGroupMode} setSelectedGroup={setSelectedGroup} />
       )}
     </div>
   );

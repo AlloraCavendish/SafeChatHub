@@ -18,6 +18,7 @@ import { useUserStore } from "../../../../lib/userStore";
 const AddUser = ({ onClose }) => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
+  const [inputValue, setInputValue] = useState("");
   const { currentUser } = useUserStore();
   const addUserRef = useRef(null);
 
@@ -65,7 +66,6 @@ const AddUser = ({ onClose }) => {
     if (!user || !currentUser) return;
 
     try {
-      // Create chat document
       const chatRef = collection(db, "chats");
       const newChatRef = doc(chatRef);
       await setDoc(newChatRef, {
@@ -74,11 +74,9 @@ const AddUser = ({ onClose }) => {
         participants: [currentUser.id, user.id]
       });
 
-      // Ensure both users have userchats documents
       await createUserChatDocIfNeeded(user.id);
       await createUserChatDocIfNeeded(currentUser.id);
 
-      // Update both users' chat lists
       const chatData = {
         chatId: newChatRef.id,
         lastMessage: "",
@@ -117,15 +115,32 @@ const AddUser = ({ onClose }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
+  const handleClearInput = () => {
+    setInputValue("");
+    setError(null);
+    setUser(null);
+  };
+
   return (
     <div className="addUser" ref={addUserRef}>
       <form onSubmit={handleSearch}>
-        <input 
-          type="text" 
-          placeholder="Username" 
-          name="username" 
-          required
-        />
+      <div className="input-wrapper">
+          <input
+            type="text"
+            placeholder="Username"
+            name="username"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            className="clear-button"
+            onClick={handleClearInput}
+          >
+            Clear Box
+          </button>
+        </div>
         <button type="submit">Search</button>
       </form>
       
