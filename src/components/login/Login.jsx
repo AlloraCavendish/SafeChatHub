@@ -6,6 +6,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth, db } from "../../lib/firebase";
+import { validateEmail, handleForgotPassword } from "../../lib/forgotPassword";
 import { doc, setDoc, collection, query, where, getDocs, getDoc } from "firebase/firestore";
 import upload from "../../lib/upload";
 import QRCode from 'react-qr-code';
@@ -19,6 +20,7 @@ const Login = () => {
   const [countdown, setCountdown] = useState(0);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [registrationComplete, setRegistrationComplete] = useState(false);
+  
 
   useEffect(() => {
     let timer;
@@ -203,8 +205,8 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
-  };
-
+  };   
+  
   return (
     <div className="login">
       <div className="form-wrapper">
@@ -224,6 +226,36 @@ const Login = () => {
               required
             />
             <button disabled={loading}>{loading ? "Loading..." : "Sign In"}</button>
+            <button
+              type="button"
+              className="forgot-password-button"
+              onClick={async () => {
+                try {
+                  const email = prompt("Enter your email:");
+                  
+                  const userDoc = await validateEmail(email);
+                  const userData = userDoc.data();
+                  
+                  const twoFACode = prompt("Enter your 2FA code:");
+
+                  const isValidToken = verifyTOTP(twoFACode, userData.secret);
+      
+                  if (!isValidToken) {
+                    throw new Error("Invalid 2FA code. Please try again.");
+                  }
+                  
+                  if (email && twoFACode) {
+                    handleForgotPassword(email, twoFACode)
+                      .then((message) => alert(message))
+                      .catch((error) => alert(error.message));
+                  }
+                } catch (error) {
+                  alert(error.message);
+                }
+              }}
+            >
+              Forgot Password?
+            </button>
           </form>
         </div>
 

@@ -45,7 +45,6 @@ export const changePassword = async () => {
     return modal;
   };
 
-  // Password strength checker
   const checkPasswordStrength = (password) => {
     const strength = {
       weak: /^.{1,7}$/,
