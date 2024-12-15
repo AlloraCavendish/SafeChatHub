@@ -35,7 +35,7 @@ const Detail = () => {
 
   const [sections, setSections] = useState({
     chatSettings: false,
-    privacyHelp: false,
+    privacySettings: false,
     sharedPhotos: true,
     sharedFiles: false
   });
@@ -191,15 +191,15 @@ const Detail = () => {
         <div className="option">
           <div 
             className="title" 
-            onClick={() => toggleSection('privacyHelp')}
+            onClick={() => toggleSection('privacySettings')}
           >
-            <span>Privacy & Help</span>
+            <span>Privacy & Settings</span>
             <img 
-              src={sections.privacyHelp ? "./arrowUp.png" : "./arrowDown.png"} 
+              src={sections.privacySettings ? "./arrowUp.png" : "./arrowDown.png"} 
               alt="" 
             />
           </div>
-          {sections.privacyHelp && (
+          {sections.privacySettings && (
             <div className="privacy-content">
               <button onClick={handleBlock} className="block-button">
                 {isCurrentUserBlocked
