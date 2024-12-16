@@ -218,7 +218,7 @@ const Detail = () => {
           )}
         </div>
 
-        <div className="option">
+        {/* <div className="option">
           <div 
             className="title" 
             onClick={() => toggleSection('sharedPhotos')}
@@ -253,9 +253,9 @@ const Detail = () => {
               )}
             </div>
           )}
-        </div>
+        </div> */}
 
-        <div className="option">
+        {/* <div className="option">
           <div 
             className="title" 
             onClick={() => toggleSection('sharedFiles')}
@@ -290,7 +290,7 @@ const Detail = () => {
               )}
             </div>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );
