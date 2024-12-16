@@ -256,7 +256,7 @@ const Chat = () => {
       </div>
       <div className="bottom">
         <div className="icons">
-          <label htmlFor="file">
+          {/* <label htmlFor="file">
             <img src="./img.png" alt="" />
           </label>
           <input
@@ -266,7 +266,7 @@ const Chat = () => {
             onChange={handleImg}
           />
           <img src="./camera.png" alt="" />
-          <img src="./mic.png" alt="" />
+          <img src="./mic.png" alt="" /> */}
         </div>
         <input
           type="text"
