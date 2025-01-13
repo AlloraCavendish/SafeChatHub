@@ -28,7 +28,7 @@ const ChatList = () => {
     if (!encryptedMessage) return "";
 
     try {
-      const bytes = AES.decrypt(encryptedMessage, "secretKey");
+      const bytes = AES.decrypt(encryptedMessage, "TI+q6GFY/6RgTyziRShd+rAdqvNAptOY9Dwv6V4rkROYva668zkfGGUKUUlDeuaB");
       const decryptedMessage = bytes.toString(enc.Utf8);
 
       if (!decryptedMessage) {
@@ -184,40 +184,43 @@ const ChatList = () => {
         </div>
       </div>
 
-      {filteredChats.map((chat) => (
-        <div
-          className="item"
-          key={chat.chatId}
-          onClick={() => handleSelect(chat)}
-          style={{
-            backgroundColor: chat?.isSeen ? "transparent" : "#5183fe",
-          }}
-        >
-          <img
-            src={
-              chat.user?.blocked?.includes(currentUser?.id)
-                ? "./avatar.png"
-                : chat.user?.avatar || "./avatar.png"
-            }
-            alt=""
-          />
-          <div className="texts">
-            <span>
-              {chat.user?.blocked?.includes(currentUser?.id)
-                ? "User"
-                : chat.user?.username}
-            </span>
-            <p>{chat.displayMessage}</p>
+       {filteredChats.length > 0 ? (
+        filteredChats.map((chat) => (
+          <div
+            className="item"
+            key={chat.chatId}
+            onClick={() => handleSelect(chat)}
+            style={{
+              backgroundColor: chat?.isSeen ? "transparent" : "#5183fe",
+            }}
+          >
+            <img
+              src={
+                chat.user?.blocked?.includes(currentUser?.id)
+                  ? "./avatar.png"
+                  : chat.user?.avatar || "./avatar.png"
+              }
+              alt=""
+            />
+            <div className="texts">
+              <span>
+                {chat.user?.blocked?.includes(currentUser?.id)
+                  ? "User"
+                  : chat.user?.username}
+              </span>
+              <p>{chat.displayMessage}</p>
+            </div>
           </div>
+        ))
+      ) : (
+        <div className="center-message">
+          Select a chat to start a conversation.
         </div>
-      ))}
-
-      {addUserMode && (
-        <AddUser onClose={() => setAddUserMode(false)} />
       )}
 
+      {addUserMode && <AddUser onClose={() => setAddUserMode(false)} />}
       {createGroupMode && (
-        <GroupChat setCreateGroupMode={setCreateGroupMode} setSelectedGroup={setSelectedGroup} />
+        <GroupChat setCreateGroupMode={setCreateGroupMode} />
       )}
     </div>
   );

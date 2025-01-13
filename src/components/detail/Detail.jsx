@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { arrayRemove, arrayUnion, doc, updateDoc, getDoc } from "firebase/firestore";
+import { arrayRemove, arrayUnion, doc, updateDoc, getDoc,  } from "firebase/firestore";
 import { onSnapshot } from "firebase/firestore";
 import { useChatStore } from "../../lib/chatStore";
 import { auth, db } from "../../lib/firebase";
 import { useUserStore } from "../../lib/userStore";
 import { changePassword } from "../../lib/changePassword";
+import { changeProfilePicture } from "../../lib/changeProfilePicture";
 import "./detail.css";
 import { AES, enc } from "crypto-js";
 
@@ -12,6 +13,8 @@ const Detail = () => {
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock, resetChat, deleteFriend } =
     useChatStore();
   const { currentUser } = useUserStore();
+  const [avatar, setAvatar] = useState(user?.avatar || "./avatar.png");
+
 
   const handleRemoveFriend = async () => {
     const confirmRemove = window.confirm(`Are you sure you want to remove ${user.username} from your friends?`);
@@ -32,6 +35,17 @@ const Detail = () => {
       console.error("Error changing password:", error);
     }
   };
+
+  const handleChangeProfilePicture = async () => {
+    if (currentUser) {
+      try {
+        const updatedAvatar = await changeProfilePicture(currentUser.id);
+        setAvatar(updatedAvatar); // Update the avatar state with the new URL
+      } catch (error) {
+        console.error("Error updating profile picture:", error);
+      }
+    }
+  }; 
 
   const [sections, setSections] = useState({
     chatSettings: false,
@@ -69,7 +83,7 @@ const Detail = () => {
               let caption = "";
               if (message.text) {
                 try {
-                  const bytes = AES.decrypt(message.text, "secretKey");
+                  const bytes = AES.decrypt(message.text, "TI+q6GFY/6RgTyziRShd+rAdqvNAptOY9Dwv6V4rkROYva668zkfGGUKUUlDeuaB");
                   caption = bytes.toString(enc.Utf8);
                 } catch (error) {
                   console.error("Caption decryption error:", error);
@@ -214,80 +228,9 @@ const Detail = () => {
               <button onClick={handleChangePassword} className="change-password-button">
                 Change Password
               </button>
-            </div>
-          )}
-        </div>
-
-        <div className="option">
-          <div 
-            className="title" 
-            onClick={() => toggleSection('sharedPhotos')}
-          >
-            <span>Shared Photos</span>
-            <img 
-              src={sections.sharedPhotos ? "./arrowUp.png" : "./arrowDown.png"} 
-              alt="" 
-            />
-          </div>
-          {sections.sharedPhotos && (
-            <div className="photos">
-              {loading ? (
-                <p>Loading shared photos...</p>
-              ) : sharedMedia.photos.length > 0 ? (
-                sharedMedia.photos.map((photo, index) => (
-                  <div className="photoItem" key={index}>
-                    <div className="photoDetail">
-                      <img src={photo.url} alt="" />
-                      <span>{photo.caption || `Photo ${formatDate(photo.timestamp)}`}</span>
-                    </div>
-                    <img
-                      src="./download.png"
-                      alt="Download"
-                      className="icon"
-                      onClick={() => handleDownload(photo.url, `photo_${index}.jpg`)}
-                    />
-                  </div>
-                ))
-              ) : (
-                <p>No shared photos</p>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="option">
-          <div 
-            className="title" 
-            onClick={() => toggleSection('sharedFiles')}
-          >
-            <span>Shared Files</span>
-            <img 
-              src={sections.sharedFiles ? "./arrowUp.png" : "./arrowDown.png"} 
-              alt="" 
-            />
-          </div>
-          {sections.sharedFiles && (
-            <div className="files">
-              {loading ? (
-                <p>Loading shared files...</p>
-              ) : sharedMedia.files.length > 0 ? (
-                sharedMedia.files.map((file, index) => (
-                  <div className="fileItem" key={index}>
-                    <div className="fileDetail">
-                      <img src="./file.png" alt="" />
-                      <span>{file.name || `File ${formatDate(file.timestamp)}`}</span>
-                    </div>
-                    <img
-                      src="./download.png"
-                      alt="Download"
-                      className="icon"
-                      onClick={() => handleDownload(file.url, file.name)}
-                    />
-                  </div>
-                ))
-              ) : (
-                <p>No shared files</p>
-              )}
+              <button onClick={handleChangeProfilePicture} className="change-profile-picture-button">
+                Change Profile Picture
+              </button>
             </div>
           )}
         </div>

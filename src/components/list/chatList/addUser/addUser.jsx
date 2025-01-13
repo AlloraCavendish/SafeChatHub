@@ -64,8 +64,21 @@ const AddUser = ({ onClose }) => {
 
   const handleAdd = async () => {
     if (!user || !currentUser) return;
-
+  
     try {
+      const currentUserChatsRef = doc(db, "userchats", currentUser.id);
+      const currentUserChatsDoc = await getDoc(currentUserChatsRef);
+  
+      if (currentUserChatsDoc.exists()) {
+        const currentChats = currentUserChatsDoc.data().chats || [];
+        const alreadyFriend = currentChats.some(chat => chat.receiverId === user.id);
+  
+        if (alreadyFriend) {
+          setError("You already Added this user");
+          return;
+        }
+      }
+  
       const chatRef = collection(db, "chats");
       const newChatRef = doc(chatRef);
       await setDoc(newChatRef, {
@@ -73,36 +86,37 @@ const AddUser = ({ onClose }) => {
         messages: [],
         participants: [currentUser.id, user.id]
       });
-
+  
       await createUserChatDocIfNeeded(user.id);
       await createUserChatDocIfNeeded(currentUser.id);
-
+  
       const chatData = {
         chatId: newChatRef.id,
         lastMessage: "",
         updatedAt: Date.now(),
       };
-
+  
       await updateDoc(doc(db, "userchats", user.id), {
         chats: arrayUnion({
           ...chatData,
           receiverId: currentUser.id
         }),
       });
-
+  
       await updateDoc(doc(db, "userchats", currentUser.id), {
         chats: arrayUnion({
           ...chatData,
           receiverId: user.id
         }),
       });
-
+  
       if (onClose) onClose();
     } catch (err) {
       console.error("Add user error:", err);
       setError("An error occurred while adding user");
     }
   };
+  
 
   useEffect(() => {
     const handleClickOutside = (event) => {

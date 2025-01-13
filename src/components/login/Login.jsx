@@ -99,9 +99,9 @@ const Login = () => {
       return;
     }
 
-    if (!/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/.test(password)) {
+    if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/.test(password)) {
       toast.warn(
-        "Password must be at least 6 characters, include one uppercase letter, and one number!"
+        "Password must be at least 6 characters, include one uppercase letter, one number, and one special character (@$!%*?&)!"
       );
       setLoading(false);
       return;

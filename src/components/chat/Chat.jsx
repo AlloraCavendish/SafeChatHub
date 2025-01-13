@@ -90,7 +90,7 @@ const Chat = () => {
   };
 
   const handleSend = async () => {
-    const encryptedText = text && AES.encrypt(text, "secretKey").toString();
+    const encryptedText = text && AES.encrypt(text, "TI+q6GFY/6RgTyziRShd+rAdqvNAptOY9Dwv6V4rkROYva668zkfGGUKUUlDeuaB").toString();
 
     if (!encryptedText && !img.file){
       toast.warn("Please enter a message or upload an image.");
@@ -99,7 +99,7 @@ const Chat = () => {
 
     let imgUrl = null;
 
-    const urlRegex = /((https?:\/\/)?([^\s\/$.?#].[^\s]*))/g;
+    const urlRegex = /\b((https?:\/\/|www\.)?[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)(\/[^\s]*)?\b/g;
     const urls = text.match(urlRegex);
 
     if (urls) {
@@ -166,9 +166,9 @@ const Chat = () => {
 
           if (chatIndex > -1) {
             const encryptedLastMessage = text 
-              ? AES.encrypt(text, "secretKey").toString()
+              ? AES.encrypt(text, "TI+q6GFY/6RgTyziRShd+rAdqvNAptOY9Dwv6V4rkROYva668zkfGGUKUUlDeuaB").toString()
               : imgUrl
-                ? AES.encrypt("Sent an image", "secretKey").toString()
+                ? AES.encrypt("Sent an image", "TI+q6GFY/6RgTyziRShd+rAdqvNAptOY9Dwv6V4rkROYva668zkfGGUKUUlDeuaB").toString()
                 : "";
 
             userChatsData.chats[chatIndex].lastMessage = encryptedLastMessage;
@@ -220,15 +220,15 @@ const Chat = () => {
           let decryptedText = "Unable to display message";
           try {
             if (message.text) {
-              const bytes = AES.decrypt(message.text, "secretKey");
+              const bytes = AES.decrypt(message.text, "TI+q6GFY/6RgTyziRShd+rAdqvNAptOY9Dwv6V4rkROYva668zkfGGUKUUlDeuaB");
               decryptedText = bytes.toString(enc.Utf8);
 
-              if (!decryptedText) {
-                decryptedText = "Decryption failed";
+              if (!decryptedText || decryptedText === "") {
+                decryptedText = "Decryption failed or empty message.";
               }
             }
           } catch (error) {
-            console.error("Decryption error:", error);
+            decryptedText = "Decryption error: Invalid encrypted data.";
           }
 
           return (
@@ -255,19 +255,6 @@ const Chat = () => {
         <div ref={endRef}></div>
       </div>
       <div className="bottom">
-        <div className="icons">
-          <label htmlFor="file">
-            <img src="./img.png" alt="" />
-          </label>
-          <input
-            type="file"
-            id="file"
-            style={{ display: "none" }}
-            onChange={handleImg}
-          />
-          <img src="./camera.png" alt="" />
-          <img src="./mic.png" alt="" />
-        </div>
         <input
           type="text"
           placeholder={
