@@ -9,7 +9,7 @@ import { changeProfilePicture } from "../../lib/changeProfilePicture";
 import "./detail.css";
 import { AES, enc } from "crypto-js";
 import { signOut } from "firebase/auth";
-
+import { toast } from "react-toastify";
 
 const Detail = () => {
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock, resetChat, deleteFriend } =
@@ -181,13 +181,7 @@ const Detail = () => {
           }}
         />
         <h2>{user?.username}</h2>
-        {/* <p className="status">
-          {userStatus.isOnline ? "Online" : userStatus.lastSeen 
-            ? `Last seen ${formatDate(userStatus.lastSeen)}`
-            : "Offline"}
-        </p> */}
       </div>
-      
       <div className="info">
         <div className="option">
           <div 
