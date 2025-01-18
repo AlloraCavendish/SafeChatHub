@@ -64,6 +64,24 @@ label img {
   object-fit: cover;
 }
 
+.avatar-upload {
+  /* display: flex; */
+  flex-direction: column;
+  /* align-items: center; */
+  gap: 10px;
+  padding: 20px;
+  border: 2px dashed #1f8ef1; /* Dashed border for a visible effect */
+  border-radius: 10px; /* Rounded corners */
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.avatar-upload:hover {
+  background-color: rgba(31, 142, 241, 0.1);
+  border-color: #1a7fd8; /* Darker color on hover */
+}
+
+
 button {
   /* width: 100%; */
   padding: 12px;

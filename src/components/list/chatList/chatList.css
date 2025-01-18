@@ -79,20 +79,6 @@
     object-fit: cover;
   }
 
-  .logout-button {
-    background-color: #5183fe;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-
-  .logout-button:hover {
-    background-color: #4169d6;
-  }
-
   .item {
     display: flex;
     align-items: center;

@@ -8,6 +8,8 @@ import { changePassword } from "../../lib/changePassword";
 import { changeProfilePicture } from "../../lib/changeProfilePicture";
 import "./detail.css";
 import { AES, enc } from "crypto-js";
+import { signOut } from "firebase/auth";
+
 
 const Detail = () => {
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock, resetChat, deleteFriend } =
@@ -47,11 +49,19 @@ const Detail = () => {
     }
   }; 
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast.success("Logged out successfully!");
+      window.location.reload();
+    } catch (err) {
+      console.error("Logout error:", err);
+      toast.error("Failed to log out.");
+    }
+  };
+
   const [sections, setSections] = useState({
-    chatSettings: false,
-    privacySettings: false,
-    sharedPhotos: true,
-    sharedFiles: false
+    privacySettings: true,
   });
   
   const [sharedMedia, setSharedMedia] = useState({
@@ -160,29 +170,6 @@ const Detail = () => {
     }
   };
 
-  const handleDownload = async (url, filename) => {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(downloadUrl);
-    } catch (error) {
-      console.error("Download error:", error);
-    }
-  };
-
-  const formatDate = (timestamp) => {
-    if (!timestamp) return "";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString();
-  };
-
   return (
     <div className="detail">
       <div className="user">
@@ -230,6 +217,9 @@ const Detail = () => {
               </button>
               <button onClick={handleChangeProfilePicture} className="change-profile-picture-button">
                 Change Profile Picture
+              </button>
+              <button onClick={handleLogout} className="logout-button">
+                Logout
               </button>
             </div>
           )}

@@ -6,7 +6,6 @@ import { useUserStore } from "../../../lib/userStore";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../../lib/firebase";
 import { useChatStore } from "../../../lib/chatStore";
-import { signOut } from "firebase/auth";
 import { toast } from "react-toastify";
 import { AES, enc } from "crypto-js";
 
@@ -125,17 +124,6 @@ const ChatList = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      toast.success("Logged out successfully!");
-      window.location.reload();
-    } catch (err) {
-      console.error("Logout error:", err);
-      toast.error("Failed to log out.");
-    }
-  };
-
   const filteredChats = (chats || []).filter((c) =>
     c.user && c.user.username.toLowerCase().includes(input.toLowerCase())
   );
@@ -163,11 +151,6 @@ const ChatList = () => {
       </div>
 
       <div className="user-section">
-        <img
-          src={currentUser?.avatar || "./avatar.png"}
-          alt="Avatar"
-          className="avatar"
-        />
         <div className="buttons-container">
           {/* <button 
             onClick={() => {
@@ -178,9 +161,7 @@ const ChatList = () => {
           >
             Create Group
           </button> */}
-          <button onClick={handleLogout} className="logout-button">
-            Logout
-          </button>
+         
         </div>
       </div>
 

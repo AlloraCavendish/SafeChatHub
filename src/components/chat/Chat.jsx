@@ -193,7 +193,7 @@ const Chat = () => {
 
   return (
     <div className="chat">
-      {/* If no user or chatId, show a placeholder */}
+      {}
       {!user || !chatId ? (
         <div className="no-chat-selected">
           <p>Select a chat to start messaging</p>

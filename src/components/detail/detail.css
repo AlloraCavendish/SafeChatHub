@@ -92,7 +92,7 @@
         border-radius: 5px;
         cursor: pointer;
         font-weight: 500;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s ease;
         margin-bottom: 10px;
         margin-top: 10px;
       }
@@ -110,7 +110,7 @@
         border-radius: 5px;
         cursor: pointer;
         font-weight: 500;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s ease;
         margin-bottom: 10px;
       }
       
@@ -127,7 +127,7 @@
         border-radius: 5px;
         cursor: pointer;
         font-weight: 500;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s ease;
         margin-bottom: 10px;
       }
       
@@ -144,14 +144,31 @@
         border-radius: 5px;
         cursor: pointer;
         font-weight: 500;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s ease;
         margin-bottom: 10px;
       }
       
       .change-profile-picture-button:hover {
         background-color: greenyellow;
       }
-
+      
+      .logout-button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        background-color: #1f8ef1;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+        margin-bottom: 10px;
+      }
+    
+      .logout-button:hover {
+        background-color: red;
+      }
+      
       .privacy-help {
         p {
           margin: 10px 0;
