@@ -42,7 +42,7 @@ const Detail = () => {
     if (currentUser) {
       try {
         const updatedAvatar = await changeProfilePicture(currentUser.id);
-        setAvatar(updatedAvatar); // Update the avatar state with the new URL
+        setAvatar(updatedAvatar);
       } catch (error) {
         console.error("Error updating profile picture:", error);
       }
