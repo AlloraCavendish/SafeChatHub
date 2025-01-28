@@ -15,7 +15,7 @@ import { useUserStore } from "../../lib/userStore";
 import upload from "../../lib/upload";
 import { format } from "timeago.js";
 import { checkUrlSafety } from "../../lib/urlChecker";
-import { AES, enc } from "crypto-js";
+import { encryptWithIV, decryptWithIV } from "../../lib/encryption";
 
 const Chat = () => {
   const [chat, setChat] = useState({ messages: [] });
@@ -90,7 +90,7 @@ const Chat = () => {
   };
 
   const handleSend = async () => {
-    const encryptedText = text && AES.encrypt(text, "TI+q6GFY/6RgTyziRShd+rAdqvNAptOY9Dwv6V4rkROYva668zkfGGUKUUlDeuaB").toString();
+    const encryptedText = text ? encryptWithIV(text) : null;
 
     if (!encryptedText && !img.file){
       toast.warn("Please enter a message or upload an image.");
@@ -165,11 +165,11 @@ const Chat = () => {
           );
 
           if (chatIndex > -1) {
-            const encryptedLastMessage = text 
-              ? AES.encrypt(text, "TI+q6GFY/6RgTyziRShd+rAdqvNAptOY9Dwv6V4rkROYva668zkfGGUKUUlDeuaB").toString()
+            const encryptedLastMessage = text
+              ? encryptWithIV(text)
               : imgUrl
-                ? AES.encrypt("Sent an image", "TI+q6GFY/6RgTyziRShd+rAdqvNAptOY9Dwv6V4rkROYva668zkfGGUKUUlDeuaB").toString()
-                : "";
+              ? encryptWithIV("Sent an image")
+              : "";
 
             userChatsData.chats[chatIndex].lastMessage = encryptedLastMessage;
             userChatsData.chats[chatIndex].isSeen = id === currentUser.id;
@@ -220,9 +220,8 @@ const Chat = () => {
           let decryptedText = "Unable to display message";
           try {
             if (message.text) {
-              const bytes = AES.decrypt(message.text, "TI+q6GFY/6RgTyziRShd+rAdqvNAptOY9Dwv6V4rkROYva668zkfGGUKUUlDeuaB");
-              decryptedText = bytes.toString(enc.Utf8);
-
+              decryptedText = decryptWithIV(message.text);
+      
               if (!decryptedText || decryptedText === "") {
                 decryptedText = "Decryption failed or empty message.";
               }

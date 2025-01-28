@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import "./chatList.css";
 import AddUser from "./addUser/addUser";
+import GroupChat from "../../chat/GroupChat";
 import { useUserStore } from "../../../lib/userStore";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../../lib/firebase";
 import { useChatStore } from "../../../lib/chatStore";
 import { toast } from "react-toastify";
-import { AES, enc } from "crypto-js";
+import { decryptLastMessage } from "../../../lib/encryption";
+
 
 const ChatList = () => {
   const [groupChats, setGroupChats] = useState([]);
@@ -21,24 +23,6 @@ const ChatList = () => {
     changeChat: state.changeChat,
     chats: state.chats,
   }));
-
-  const decryptLastMessage = (encryptedMessage) => {
-    if (!encryptedMessage) return "";
-
-    try {
-      const bytes = AES.decrypt(encryptedMessage, "TI+q6GFY/6RgTyziRShd+rAdqvNAptOY9Dwv6V4rkROYva668zkfGGUKUUlDeuaB");
-      const decryptedMessage = bytes.toString(enc.Utf8);
-
-      if (!decryptedMessage) {
-        return "Unable to display message";
-      }
-
-      return decryptedMessage;
-    } catch (error) {
-      console.error("Message decryption error:", error);
-      return "Unable to display message";
-    }
-  };
 
   useEffect(() => {
     const fetchGroupChats = async () => {
@@ -151,16 +135,6 @@ const ChatList = () => {
 
       <div className="user-section">
         <div className="buttons-container">
-          {/* <button 
-            onClick={() => {
-              setCreateGroupMode(true);
-              setAddUserMode(false);
-            }} 
-            className="create-group-button"
-          >
-            Create Group
-          </button> */}
-         
         </div>
       </div>
 
