@@ -26,8 +26,6 @@ const decryptWithIV = (ciphertext) => {
     });
     return decrypted.toString(CryptoJS.enc.Utf8);
   } catch (error) {
-    console.error("Decryption error:", error);
-    return "Decryption error: Invalid encrypted data.";
   }
 };
 
