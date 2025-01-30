@@ -167,7 +167,7 @@ const ChatList = () => {
         ))
       ) : (
         <div className="center-message">
-          Select a chat to start a conversation.
+          Select a chat to start a conversation
         </div>
       )}
 

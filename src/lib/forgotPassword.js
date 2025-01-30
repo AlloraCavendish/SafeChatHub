@@ -7,7 +7,7 @@ const verifyTOTP = (token, secret) => {
   try {
     const totp = new OTPAuth.TOTP({
       issuer: "SafeChatHub",
-      algorithm: "SHA1",
+      algorithm: "SHA256",
       digits: 6,
       period: 30,
       secret: OTPAuth.Secret.fromBase32(secret),
