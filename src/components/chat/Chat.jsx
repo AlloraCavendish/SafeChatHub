@@ -90,6 +90,16 @@ const Chat = () => {
   };
 
   const handleSend = async () => {
+    const { chatId, chats } = useChatStore.getState();
+
+    const chatExists = chats.some((chat) => chat.chatId === chatId);
+
+    if (!chatExists) {
+      toast.warn("You are blocked by this user and cannot send messages.");
+      window.location.reload(); 
+      return;
+    }
+    
     const encryptedText = text ? encryptWithIV(text) : null;
 
     if (!encryptedText && !img.file){
